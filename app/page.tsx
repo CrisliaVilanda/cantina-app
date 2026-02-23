@@ -1,3 +1,5 @@
+import Link from 'next/link';
+import Footer from './components/Footer';
 import Header from './components/Header';
 
 export default function Home() {
@@ -9,12 +11,17 @@ export default function Home() {
         <h1 className="flex flex-col items-center text-4xl font-bold">Bem-vindo à Cantina José</h1>
         <div className="flex flex-col p-2 space-y-4">
           <p className="text-2xl">Quero fazer meu pedido na cantina.</p>
-          <button type="button" className="bg-blue-500 focus:bg-blue-700 text-white font-bold py-4 px-4 rounded">Fazer Pedido</button>
+          <Link href="/cliente" className="bg-blue-500 focus:bg-blue-700 text-white font-bold py-4 px-4 rounded">
+            Fazer Pedido
+          </Link>
+          
           </div>
             <div className="flex flex-wrap items-center justify-around h-4 max-w-6xl mt-50 sm:w-full">
               <div className="space-y-6 mt-6">
                 <p className="text-1xl">Sou um integrante da equipe.</p>
-                  <button type="button" className="bg-blue-500 focus:bg-blue-700 text-white font-bold py-4 px-4 rounded">Fazer login</button>
+                <Link href="/atendente" className="bg-blue-500 focus:bg-blue-700 text-white font-bold py-4 px-4 rounded">
+                  Fazer login
+                </Link>
               </div>
               <div className="space-y-6 mt-6"> 
                 <p className="text-1xl">Sou um integrante da equipe e não tenho acesso ao painel de pedidos.</p>
@@ -23,6 +30,7 @@ export default function Home() {
             </div>
       </main>
     </div>
+    <Footer />
     </>  
   );
 }
