@@ -1,7 +1,10 @@
+import Header from './components/Header';
 
 export default function Home() {
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2">
+  return (  
+    <>
+    <Header />
+    <div className="flex flex-col items-center justify-center min-h-screen py-2">      
       <main className="flex flex-col items-center justify-center p-5 w-full flex-1 px-20 text-center">
         <h1 className="flex flex-col items-center text-4xl font-bold">Bem-vindo à Cantina José</h1>
         <div className="flex flex-col p-2 space-y-4">
@@ -20,5 +23,6 @@ export default function Home() {
             </div>
       </main>
     </div>
+    </>  
   );
 }
