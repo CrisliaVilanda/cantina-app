@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function Home() {
   return (  
-    <div className="flex flex-col items-center justify-cente py-2">      
+    <div className="flex flex-col items-center justify-center py-2 min-h-screen">      
       <main className="flex flex-col items-center justify-center p-5 w-full flex-1 px-20 text-center">
         <h1 className="flex flex-col items-center text-4xl font-bold">Bem-vindo à Cantina José</h1>
         <div className="flex flex-col p-2 space-y-4">
