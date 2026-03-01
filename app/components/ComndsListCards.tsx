@@ -38,7 +38,7 @@ export function ComndsListCards( {id, title, description,  statusPayment, price}
         <p>{price}</p>
           {/*Ver detalhes do pedido*/}
           <Button asChild>
-            <Link href={'/admin/${id}'}>Ver detalhes</Link>
+            <Link href={`/admin/${id}`}>Ver detalhes</Link>
           </Button>
           </div>
       </CardFooter>
