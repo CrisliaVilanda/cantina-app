@@ -21,7 +21,9 @@ export default function Home() {
               </div>
               <div className="space-y-6 mt-6"> 
                 <p className="text-1xl">Sou um integrante da equipe e não tenho acesso ao painel de pedidos.</p>
-                  <button type="button" className="bg-blue-500 focus:bg-blue-700 text-white font-bold py-4 px-4 rounded">Falar com o administrador</button>
+                  <button type="button" className="bg-blue-500 focus:bg-blue-700 text-white font-bold py-4 px-4 rounded">
+                      Falar com o administrador
+                    </button>
               </div>
             </div>
       </main>

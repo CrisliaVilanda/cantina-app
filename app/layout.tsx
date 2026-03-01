@@ -22,13 +22,14 @@ export default function RootLayout({
   return (
     <html lang="pt-br">
       <body className={`${roboto.variable} antialiased`}>
-        <div className="flex flex-col min-h-screen">
           <Header />  
-          <main className="grow ">
-              {children}
-            </main>          
-          <Footer />
-        </div>
+          <main className="grow">
+
+          </main>
+          <div className="flex flex-col min-h-screen">          
+            {children}
+            </div>
+            <Footer />
       </body>       
     </html>
   );
