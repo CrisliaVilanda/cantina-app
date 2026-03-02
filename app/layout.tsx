@@ -23,12 +23,11 @@ export default function RootLayout({
     <html lang="pt-br">
       <body className={`${roboto.variable} antialiased`}>
           <Header />  
-          <main className="grow">
-
-          </main>
           <div className="flex flex-col min-h-screen">          
-            {children}
-            </div>
+            <main className="grow">
+              {children}
+            </main>            
+          </div>
             <Footer />
       </body>       
     </html>
