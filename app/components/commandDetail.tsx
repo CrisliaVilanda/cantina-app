@@ -19,8 +19,9 @@ const item = {
    id:"1",
    title:"Cliente 01",
    description:[
-    {title:"sanduíche",
-    subtitle: "queijo com presunto e requeijão",
+    {
+      title:"sanduíche",
+      subtitle: "queijo com presunto e requeijão",
   },
   {
     title: "suco de cajá",

@@ -1,6 +1,6 @@
 
-import { CommandsList } from "../components/CommandsList"
-import { ComndsListCards } from "../components/ComndsListCards"
+// import { CommandsList } from "../components/CommandsList"
+import { ComndsListCards } from "../../components/ComndsListCards"
 
 
 // simulação de banco
