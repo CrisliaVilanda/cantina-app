@@ -7,9 +7,7 @@ export default function EntradasPage() {
     <div className="container mx-auto px-4 py-4">
       <div className="flex justify-between items-center mb-6">
         <div className="space-y-2">
-          <h1 className="text-3xl font-semibold">
-            Estoque de alimentos alteração
-          </h1>
+          <h1 className="text-3xl font-semibold">Estoque de alimentos</h1>
           <h3 className="text-xl font-light">Entradas</h3>
         </div>
         <Button asChild>
