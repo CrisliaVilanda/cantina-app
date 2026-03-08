@@ -2,9 +2,9 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 # versions
 
-node: 24.13.1
-React: 19.2.3
-Next: 16.1.6
+- node: 24.13.1
+- React: 19.2.3
+- Next: 16.1.6
 
 ## Getting Started
 
@@ -22,7 +22,8 @@ bun dev
 
 ## Other instalations
 
-site: https://ui.shadcn.com/
+- shadcn: https://ui.shadcn.com/
+- React Hook Form: https://react-hook-form.com/get-started
 
 ```bash
 npx shadcn@latest init
@@ -50,4 +51,3 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
 # About the project
-
