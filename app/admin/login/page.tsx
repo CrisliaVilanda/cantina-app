@@ -1,9 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 
-
-// items-center justify-center p-5 w-full flex-1 px-10 text-center
-// grid grid-cols-1 md:grid-cols-2
 export default function LoginAtendente(){
   return (
     <main className="grid grid-cols-2 min-h-screen">
