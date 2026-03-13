@@ -19,7 +19,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>
 
-export default function EntradaForm() {
+export default function EstoqueForm() {
 
 
 
@@ -126,11 +126,15 @@ export default function EntradaForm() {
             </div>
           </FieldGroup>
           <FieldGroup>
+
+          </FieldGroup>
+
+          <FieldGroup>
             <div>
               <Field orientation="horizontal">
                 <Button type="submit">Registrar</Button>
                 <Button asChild variant="outline" type="button">
-                  <Link href="/admin/entradas/">Cancelar</Link>
+                  <Link href="/admin/estoque/">Cancelar</Link>
                 </Button>
               </Field>
             </div>
