@@ -1,58 +1,44 @@
-import { BarChart3, ClipboardList, LayoutDashboard, Menu, Package, UserCog, Utensils } from "lucide-react";
+import { BarChart3, ClipboardList, LayoutDashboard, Package, UserCog, Utensils } from "lucide-react";
 import Link from "next/link";
 
-export default function Sidebar() {
+type SidebarProps = {
+  sidebarOpen: boolean;
+};
+
+export default function Sidebar( {sidebarOpen} : SidebarProps) {
+
+  const menu = [
+    {title: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard"},
+    {title: "Estoque", icon: Package, path: "/admin/estoque"},
+    {title: "Gerenciar cardápio", icon: Utensils, path: "/admin/cardapio"},
+    {title: "Painel de pedidos", icon: ClipboardList, path: "/admin/painel"},
+    {title: "Relatório de vendas", icon: BarChart3, path: "/admin/relatorios"},
+    {title: "Configurações", icon: UserCog, path: "/admin/perfil"},
+  ]
+
   return (
-    <aside className="w-64 h-screen bg-blue-950 text-white p-6 space-y-3">
-      <div className="flex items-center gap-2">
-        <h2 className="font-semibold">Menu administrativo</h2>
+    <aside className="flex flex-col h-full bg-blue-950 text-white p-6 space-y-3 px-5">
+      <div className="flex items-center justify-center h-20">
+        {sidebarOpen ? "imagem" : "I"}
       </div>
 
-      <nav className="flex flex-col space-x-y mb-5 p-4 text-left">
-        <ul className="flex-gap-4">
-          <li>
-            <Link
-              href="/admin/dashboard"
-              className="flex gap-3 p-3 rounded-md hover:bg-blue-800  transition">
-              <LayoutDashboard /> Dashboard
+      <nav className="flex-1 p-3">
+        <ul className="flex- flex-col gap-2">
+       {menu.map((item) => {
+        const Icon = item.icon
+        return (
+          <li key={item.title} className={`${sidebarOpen ? "" : "flex items-center justify-center"}`}>
+            <Link 
+            href={item.path}
+            className={`flex items-center p-3 rounded-md hover:bg-blue-700 tezt-white transition ease-in-out ${sidebarOpen ? "justify-start gap-3 p-3" : "justify-center"}`}
+            >
+            <Icon size={20} className="shrink-0" />
+            <span className={`${sidebarOpen ? "block" : "hidden"}`}>{item.title}</span>
             </Link>
-          </li>
-          <li>
-            <Link
-              href="/admin/estoque"
-              className="flex gap-3 p-3 rounded-md hover:bg-blue-800  transition">
-              <Package />Estoque
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/admin/cardapio"
-              className="flex gap-3 p-3 rounded-md hover:bg-blue-800  transition">
-              <Utensils />Gerenciar cardápio
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/admin/painel"
-              className="flex gap-3 p-3 rounded-md hover:bg-blue-800  transition">
-              <ClipboardList /> Painel de pedidos
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/admin/painel"
-              className="flex gap-3 p-3 rounded-md hover:bg-blue-800  transition">
-              <BarChart3 /> Relatório de venda
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/admin/perfil"
-              className="flex gap-3 p-3 rounded-md hover:bg-blue-800  transition">
-              <UserCog />Configurações
-            </Link>
-          </li>
 
+          </li>
+        )
+       })}
         </ul>
 
 
