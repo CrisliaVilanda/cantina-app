@@ -1,7 +1,6 @@
 // ao cadastrar informar quantos produtos tem disponível para a venda
-import { Button } from "@/components/ui/button";
-import { Link } from "lucide-react";
-import { PlusCircle } from "lucide-react";
+import BotaoDeAcao from "@/app/components/BotaoDeAcao";
+
 
 export default function CardapioPage() {
   return (
@@ -11,14 +10,8 @@ export default function CardapioPage() {
           <h1 className="text-3xl font-semibold">Cardápio</h1>
           <h3 className="text-xl font-light">Gerenciar itens do cardápio</h3>
         </div>
-        <Button asChild>
-          <Link href="/admin/cardapio/new">
-            <PlusCircle className="mr-2 h-5 w-5" />
-            Adicionar
-          </Link>
-        </Button>
+        <BotaoDeAcao textoBotao="Adicionar item ao cardápio" linkBotao="/admin/cardapio/new" />
       </div>
-
     </div>
   );
 

@@ -1,6 +1,4 @@
-import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
-import Link from "next/link";
+import BotaoDeAcao from "@/app/components/BotaoDeAcao";
 
 export default function EstoquePage() {
   return (
@@ -10,11 +8,7 @@ export default function EstoquePage() {
           <h1 className="text-3xl font-semibold">Estoque de alimentos</h1>
           <h3 className="text-xl font-light">Controle de estoque</h3>
         </div>
-        <Button asChild>
-          <Link href="/admin/estoque/new">
-            <PlusCircle className="mr-2 h-5 w-5" /> Adicionar ao estoque
-          </Link>
-        </Button>
+        <BotaoDeAcao textoBotao="Adicionar item ao estoque" linkBotao="/admin/estoque/new" />
       </div>
       <div>
         <h3>Tabela</h3>
