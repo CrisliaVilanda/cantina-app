@@ -24,7 +24,10 @@ export default function Header({ toggleSidebar }: HeaderProps) {
 
           </div>
           <div className="flex items-center gap-4">
-            <li className="text-xl font-bold text-foreground">Client name</li>
+            <li 
+            className="text-xl font-bold text-foreground">
+              user.name
+              </li>
             <li>
               <ThemeToggle />
             </li>
