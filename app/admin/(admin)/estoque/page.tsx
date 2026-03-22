@@ -1,4 +1,4 @@
-import BotaoDeAcao from "@/app/components/BotaoDeAcao";
+import BotaoDeAcao from "@/app/components/BotaoDeLink";
 
 export default function EstoquePage() {
   return (

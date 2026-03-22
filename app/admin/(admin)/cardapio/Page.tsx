@@ -1,5 +1,5 @@
 // ao cadastrar informar quantos produtos tem disponível para a venda
-import BotaoDeAcao from "@/app/components/BotaoDeAcao";
+import BotaoDeAcao from "@/app/components/BotaoDeLink";
 
 
 export default function CardapioPage() {
