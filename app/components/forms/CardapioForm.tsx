@@ -1,15 +1,19 @@
 "use client"
-import { Field, FieldLabel, FieldDescription, FieldError, FieldGroup, FieldLegend, FieldSet } from "@/components/ui/field"
+import { Field, FieldLabel, FieldDescription, FieldError, FieldGroup, FieldLegend, FieldSet, FieldContent } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm } from "react-hook-form"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { NumericFormat } from "react-number-format"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 
 const formSchema = z.object({
   itemName: z.string().min(3, "Descrição deve conter no mínimo 3 caracteres."),
   itemDescription: z.string().min(10, "Descrição deve conter no mínimo 10 caracteres."),
-  itemPriceSele: z.string().min(1, "Informe o preço"),
+  itemPriceSele: z.string().min(1, "Informe o preço deste item."),
+  itemAvailableMenu: z.string().min(1, "Informe a disponibilidade deste item."),
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -22,6 +26,7 @@ export default function CardapioForm() {
       itemName: "",
       itemDescription: "",
       itemPriceSele: "",
+      itemAvailableMenu: "",
     },
   })
 
@@ -39,20 +44,120 @@ export default function CardapioForm() {
           <FieldGroup>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3 justify-between space-x-5 space-y-6">
               <div>
-            <Controller
-            name="itemName"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field>
-                <FieldLabel htmlFor="itemName">Nome do item</FieldLabel>
-                <Input {...field} id="itemName" placeholder="sanduiche, suco de acerola..." aria-invalid={fieldState.invalid} />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-                <FieldDescription>Informe o nome do item para a venda</FieldDescription>
-              </Field>
-            )}
-            />
+                <Controller
+                  name="itemName"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field>
+                      <FieldLabel htmlFor="itemName">Nome do item</FieldLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <SelectTrigger aria-invalid={fieldState.invalid}>
+                          <SelectValue placeholder="Café" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel>tem</SelectLabel>
+                            <SelectItem value="id1">Coca-cola</SelectItem>
+                            <SelectItem value="id2">Empada</SelectItem>
+                            <SelectItem value="id3">Água mineral</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                      <FieldDescription>Selecione o item em estoque</FieldDescription>
+                    </Field>
+                  )}
+                />
+              </div>
+              <div>
+                <Controller
+                  name="itemName"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field>
+                      <FieldLabel htmlFor="itemCategory">Categoria</FieldLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <SelectTrigger aria-invalid={fieldState.invalid}>
+                          <SelectValue placeholder="Bebidas" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel>Categorias</SelectLabel>
+                            <SelectItem value="id1">Bebidas</SelectItem>
+                            <SelectItem value="id2">Lanches e salgadosa</SelectItem>
+                            <SelectItem value="id3">Porções</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                      <FieldDescription>Selecione a categoria deste item</FieldDescription>
+                    </Field>
+                  )}
+                />
+              </div>
+              <div>
+                <Controller
+                  name="itemPriceSele"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field>
+                      <FieldLabel htmlFor="productPrice">Preço de compra</FieldLabel>
+                      <NumericFormat
+                        value={field.value}
+                        thousandSeparator="."
+                        decimalSeparator=","
+                        prefix="R$"
+                        decimalScale={2}
+                        fixedDecimalScale
+                        customInput={Input}
+                        onValueChange={(values) => (
+                          field.onChange(values.value)
+                        )}
+                        id="itemPriceSele"
+                        placeholder="R$ 10,00"
+                        aria-invalid={fieldState.invalid}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                      <FieldDescription>Informe o preço de venda deste item</FieldDescription>
+                    </Field>
+                  )}
+                />
+              </div>
+              <div>
+                <Controller
+                  name="itemAvailableMenu"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field>
+                      <FieldLabel htmlFor="itemAnableMenu">Disponível no cardápio?</FieldLabel>
+                      <RadioGroup className="w-full max-w-xs"
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        aria-invalid={fieldState.invalid}>
+                        <Field orientation="horizontal">
+                          <RadioGroupItem value="sim" id="itemEnableMenu" />
+                          <FieldLabel htmlFor="itemEnableMenu">Sim</FieldLabel>
+                        </Field>
+                        <Field orientation="horizontal">
+                          <RadioGroupItem value="nao" id="itemDisanableMenu" />
+                          <FieldLabel htmlFor="itemDisanableMenu">Não</FieldLabel>
+                        </Field>
+                      </RadioGroup>
+                    </Field>
+                  )}
+                />
               </div>
             </div>
           </FieldGroup>

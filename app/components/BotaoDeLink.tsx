@@ -7,7 +7,6 @@ type BotaoDeAcaoProps = {
   linkBotao: string;
 };
 
-
 export default function BotaoDeLink({ textoBotao, linkBotao }: BotaoDeAcaoProps) {
   return (
     <div>
