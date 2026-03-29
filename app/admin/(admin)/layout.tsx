@@ -24,7 +24,6 @@ export default function ClientLayout({
      <div className="flex flex-col flex-1">
           <Header toggleSidebar={() => setSidebarOpen(!sidebarOpen)}  />
           <main className="flex-1 p-6">
-       
             {children}
           </main>
           <Footer />
