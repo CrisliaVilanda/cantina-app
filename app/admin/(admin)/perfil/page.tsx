@@ -1,5 +1,10 @@
 export default function UserProfile () {
   return (
-    <p>Perfil do usuário</p>
+    <div>
+      <p>Perfil do usuário</p>
+      <p>nome</p>
+      <button>Alterar senha</button>
+      <p>Seu perfil: atendente</p>
+    </div>
   )
 }
