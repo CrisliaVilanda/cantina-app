@@ -1,7 +1,7 @@
 import EstoqueForm from "@/app/components/forms/EstoqueForm";
 
 
-export default function NewEstoquePage () {
+export default function NewEstoquePage() {
   return (
     <div className="container mx-auto px-4 py-8 w-full">
       <h1 className="text-3xl font-semibold mb-6">

@@ -1,0 +1,17 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Estoque {
+  id                   String   @id @default(uuid())
+  produto              String
+  unidadeMedida        String
+  quantidadeAdquirida  Int
+  quantidadeSaidas     Int
+  preco                 Decimal @db.Decimal(10, 2)
+  dataAquisicao        DateTime @default(now())
+}
