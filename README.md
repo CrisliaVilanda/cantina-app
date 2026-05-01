@@ -52,12 +52,29 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 # About the project
 
-Criar migrations
-npx prisma migrate dev --name init
+### stup e instalação do prisma
 
-adicionou novo campo
-- npx prisma migrate dev --name add_preco
-gerar client
-- npx prisma generate
-reiniciar next
-- npm run dev
+npm install prisma @prisma/client
+npx prisma init
+
+### Geração do client (quando há mudança no schema)
+
+npx prisma generate
+
+### Criação de migrations
+
+npx prisma migrate dev --name nome_da_mudanca
+Exemplo
+npx prisma migrate dev --name create_estoque
+npx prisma migrate dev --name add_preco
+
+### Visualização do banco
+
+npx prisma studio
+ou mudar porta
+npx prisma studio --port 5556
+
+### Reiniciar TS no vscode
+
+Ctrl + Shift + P
+→ TypeScript: Restart TS Server
