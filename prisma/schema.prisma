@@ -7,11 +7,37 @@ datasource db {
 }
 
 model Estoque {
-  id                   String   @id @default(uuid())
-  produto              String
-  unidadeMedida        String
-  quantidadeAdquirida  Int
-  quantidadeSaidas     Int
-  preco                 Decimal @db.Decimal(10, 2)
-  dataAquisicao        DateTime @default(now())
+  id                  String     @id @default(uuid())
+  produto             String
+  unidadeMedida       String
+  quantidadeAdquirida Int
+  quantidadeSaidas    Int
+  preco               Decimal    @db.Decimal(10, 2)
+  dataAquisicao       DateTime   @default(now())
+  cardapios           Cardapio[]
+}
+
+model Cardapio {
+  id              String   @id @default(uuid())
+  nome            String
+  descricao       String
+  categoria       String
+  precoVenda      Decimal  @db.Decimal(10, 2)
+  quantidadeVenda Int
+  ativo           Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  estoqueId       String
+
+  estoque Estoque @relation(fields: [estoqueId], references: [id])
+  vendas  Venda[]
+}
+
+model Venda {
+  id         String   @id @default(uuid())
+  cardapioId String
+  quantidade Int
+  total      Decimal  @db.Decimal(10, 2)
+  createdAt  DateTime @default(now())
+
+  cardapio Cardapio @relation(fields: [cardapioId], references: [id])
 }

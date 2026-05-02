@@ -36,7 +36,7 @@ export function CurrencyInput<T extends FieldValues>({
             placeholder={placeholder}
             aria-invalid={fieldState.invalid}
             className={`
-              border px-3 py-2 rounded-md bg-sidebar-accent
+              w-full border px-3 py-2 rounded-md bg-sidebar-accent
               focus:outline-none focus:ring-2 focus:ring-blue-500
               ${fieldState.error ? "border-red-500" : "border-gray-300"}
             `}

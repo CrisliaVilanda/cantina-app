@@ -1,18 +1,26 @@
 "use client";
 
+import {
+  FieldGroup,
+  FieldLegend,
+  FieldSet,
+  Field,
+} from "@/components/ui/field";
+
 import { Button } from "@/components/ui/button";
-import { Field, FieldGroup, FieldLegend, FieldSet } from "@/components/ui/field";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
 import Link from "next/link";
 
-import { CurrencyInput } from "./CurrencyInput";
-import { SelectForm } from "./SelectInput";
-import { NumberInput } from "./NumberInput";
-import { InputForm } from "./InputForm";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
 import { criarItemEstoque } from "@/app/actions/estoque.actions";
+
+//  COMPONENTES PADRÃO
+import { InputForm } from "./InputForm";
+import { CurrencyInput } from "./CurrencyInput";
+import { NumberInput } from "./NumberInput";
+import { SelectForm } from "./SelectInput";
 
 const formSchema = z.object({
   ProductName: z.string().min(3),
@@ -33,7 +41,7 @@ export default function EstoqueForm() {
       quantity: "",
     },
   });
-  
+
   async function onSubmit(data: FormValues) {
     await criarItemEstoque(data);
   }
@@ -41,9 +49,7 @@ export default function EstoqueForm() {
   return (
     <div className="flex flex-col px-4 py-8 items-center-center">
       <form
-        onSubmit={form.handleSubmit(onSubmit, (errors) => {
-          console.log("Erros do formulário:", errors);
-        })}
+        onSubmit={form.handleSubmit(onSubmit)}
       >
         <FieldSet>
           <FieldLegend>Informações do produto</FieldLegend>
