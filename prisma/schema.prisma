@@ -41,3 +41,16 @@ model Venda {
 
   cardapio Cardapio @relation(fields: [cardapioId], references: [id])
 }
+
+model SaldoDiario {
+  id String @id @default(uuid())
+
+  data DateTime @unique
+
+  totalVendas Int @default(0)
+
+  totalArrecadado Decimal @db.Decimal(10, 2)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
