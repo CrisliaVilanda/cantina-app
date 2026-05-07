@@ -2,17 +2,23 @@
 
 import { prisma } from "@/lib/prisma";
 
+type RegistrarVendaProps = {
+  cardapioId: string;
+  quantidade: number;
+  cliente: string;
+};
+
 export async function registrarVenda({
   cardapioId,
   quantidade,
-}: {
-  cardapioId: string;
-  quantidade: number;
-}) {
+  cliente,
+}: RegistrarVendaProps) {
+  // BUSCA ITEM DO CARDÁPIO
   const item = await prisma.cardapio.findUnique({
     where: {
       id: cardapioId,
     },
+
     include: {
       estoque: true,
     },
@@ -22,11 +28,30 @@ export async function registrarVenda({
     throw new Error("Item não encontrado");
   }
 
+  // VALIDA ESTOQUE
+  const restante =
+    item.estoque.quantidadeAdquirida - item.estoque.quantidadeSaidas;
+
+  if (quantidade > restante) {
+    throw new Error("Estoque insuficiente");
+  }
+
+  // TOTAL DA VENDA
   const total = Number(item.precoVenda) * quantidade;
+
+  // CRIA PEDIDO
+  const pedido = await prisma.pedido.create({
+    data: {
+      cliente,
+      status: "pendente",
+      total,
+    },
+  });
 
   // REGISTRA VENDA
   await prisma.venda.create({
     data: {
+      pedidoId: pedido.id,
       cardapioId,
       quantidade,
       total,
@@ -38,6 +63,7 @@ export async function registrarVenda({
     where: {
       id: item.estoqueId,
     },
+
     data: {
       quantidadeSaidas: {
         increment: quantidade,
@@ -45,7 +71,7 @@ export async function registrarVenda({
     },
   });
 
-  // DATA DE HOJE
+  // DATA DO DIA
   const hoje = new Date();
 
   const dataHoje = new Date(
@@ -54,7 +80,7 @@ export async function registrarVenda({
     hoje.getDate(),
   );
 
-  // ATUALIZA SALDO
+  // ATUALIZA SALDO DIÁRIO
   await prisma.saldoDiario.upsert({
     where: {
       data: dataHoje,
@@ -76,4 +102,9 @@ export async function registrarVenda({
       totalArrecadado: total,
     },
   });
+
+  return {
+    success: true,
+    pedidoId: pedido.id,
+  };
 }

@@ -33,11 +33,16 @@ model Cardapio {
 }
 
 model Venda {
-  id         String   @id @default(uuid())
+  id String @id @default(uuid())
+
   cardapioId String
   quantidade Int
-  total      Decimal  @db.Decimal(10, 2)
-  createdAt  DateTime @default(now())
+  total      Decimal @db.Decimal(10, 2)
+
+  pedidoId String
+  pedido   Pedido @relation(fields: [pedidoId], references: [id])
+
+  createdAt DateTime @default(now())
 
   cardapio Cardapio @relation(fields: [cardapioId], references: [id])
 }
@@ -53,4 +58,22 @@ model SaldoDiario {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum PedidoStatus {
+  PENDENTE
+  PREPARO
+  PRONTO
+  ENTREGUE
+}
+
+model Pedido {
+  id      String  @id @default(uuid())
+  cliente String
+  status  String
+  total   Decimal @db.Decimal(10, 2)
+
+  createdAt DateTime @default(now())
+
+  itens Venda[]
 }

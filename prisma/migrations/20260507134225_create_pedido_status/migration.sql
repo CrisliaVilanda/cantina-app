@@ -1,0 +1,2 @@
+-- CreateEnum
+CREATE TYPE "PedidoStatus" AS ENUM ('PENDENTE', 'PREPARO', 'PRONTO', 'ENTREGUE');
