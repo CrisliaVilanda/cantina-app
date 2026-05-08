@@ -18,18 +18,27 @@ model Estoque {
 }
 
 model Cardapio {
-  id              String   @id @default(uuid())
-  nome            String
-  descricao       String
-  categoria       String
-  precoVenda      Decimal  @db.Decimal(10, 2)
+  id String @id @default(uuid())
+
+  nome      String
+  descricao String
+  categoria String
+
+  precoVenda Decimal @db.Decimal(10, 2)
+
   quantidadeVenda Int
-  ativo           Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  estoqueId       String
+
+  ativo Boolean @default(true)
+
+  estoqueId String
 
   estoque Estoque @relation(fields: [estoqueId], references: [id])
-  vendas  Venda[]
+
+  vendas Venda[]
+
+  previsoes PrevisaoVenda[]
+
+  createdAt DateTime @default(now())
 }
 
 model Venda {
@@ -76,4 +85,82 @@ model Pedido {
   createdAt DateTime @default(now())
 
   itens Venda[]
+}
+
+model RelatorioMensal {
+  id String @id @default(uuid())
+
+  referencia String
+
+  totalVendas      Int
+  totalFaturamento Decimal @db.Decimal(10, 2)
+
+  itemMaisVendido      String
+  categoriaMaisVendida String
+
+  createdAt DateTime @default(now())
+}
+
+model HistoricoEstoque {
+  id String @id @default(uuid())
+
+  produto         String
+  quantidadeAtual Int
+
+  createdAt DateTime @default(now())
+}
+
+model PrevisaoVenda {
+  id String @id @default(uuid())
+
+  cardapioId String
+
+  previsaoProximaSemana Int
+  previsaoProximoMes    Int
+
+  createdAt DateTime @default(now())
+
+  cardapio Cardapio @relation(fields: [cardapioId], references: [id])
+}
+
+model Caixa {
+  id String @id @default(uuid())
+
+  tipo      String
+  descricao String
+
+  valor Decimal @db.Decimal(10, 2)
+
+  createdAt DateTime @default(now())
+}
+
+model Despesa {
+  id String @id @default(uuid())
+
+  descricao String
+
+  valor Decimal @db.Decimal(10, 2)
+
+  categoria String
+
+  createdAt DateTime @default(now())
+}
+
+model Usuario {
+  id String @id @default(uuid())
+
+  nome  String
+  email String @unique
+  senha String
+
+  role String
+}
+
+model LogSistema {
+  id String @id @default(uuid())
+
+  usuario String
+  acao    String
+
+  createdAt DateTime @default(now())
 }
