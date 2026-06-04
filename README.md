@@ -68,14 +68,18 @@ bun install
 
 # Banco de dados (PostgreSQL)
 
+```bash
 DATABASE_URL="postgresql://usuario:senha@localhost:5432/nome_do_banco"
+```
 
 # Autenticação (exemplo com NextAuth – ajuste conforme sua implementação)
 
+```bash
 NEXTAUTH_SECRET="seu-segredo-aqui"
 NEXTAUTH_URL="http://localhost:3000"
+```
 
-# Opcional: chaves de gateway de pagamento, serviços externos etc.
+- Opcional: chaves de gateway de pagamento, serviços externos etc.
 
 # Execute as migrations do Prisma
 
