@@ -1,80 +1,122 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🍽️ Plataforma de Gestão de Pedidos
 
-# versions
+Sistema completo para gerenciamento de pedidos, ideal para restaurantes, lanchonetes ou serviços de entrega. Permite que clientes façam pedidos e que atendentes/administradores gerenciem estoque, cardápio, pedidos, pagamentos e gerem relatórios.
 
-- node: 24.13.1
-- React: 19.2.3
-- Next: 16.1.6
+## ✨ Funcionalidades
 
-## Getting Started
+### 👤 Cliente
 
-First, run the development server:
+- Visualização do cardápio dinâmico
+- Realização de pedidos com cálculo automático
+- Acompanhamento do status do pedido
+- Integração com sistema de pagamentos
+
+### 🧑‍💼 Atendente / Admin
+
+- **Dashboard** com métricas e indicadores
+- **Gestão de cardápio** (CRUD de produtos, categorias, preços)
+- **Controle de estoque** com atualização automática após pedidos
+- **Painel de pedidos** em tempo real (novos, em preparo, entregues)
+- **Geração de relatórios** (vendas, produtos mais vendidos, etc.)
+- **Sistema de login** por usuário (autenticação)
+- **Gestão de pagamentos** integrada
+
+## 🧰 Tecnologias
+
+| Ferramenta      | Versão                   |
+| --------------- | ------------------------ |
+| Node.js         | 24.13.1                  |
+| React           | 19.2.3                   |
+| Next.js         | 16.1.6                   |
+| Prisma          | 7.8                      |
+| Shadcn/ui       | 11.8.0                   |
+| React Hook Form | 71.2                     |
+| Banco de dados  | PostgreSQL (recomendado) |
+
+## 📋 Pré-requisitos
+
+- Node.js 24.13.1 (use [nvm](https://github.com/nvm-sh/nvm) se necessário)
+- npm, yarn, pnpm ou bun
+- PostgreSQL instalado ou serviço em nuvem (ex: [Neon](https://neon.tech), [Supabase](https://supabase.com))
+
+## 🚀 Instalação e configuração
+
+1. **Clone o repositório**
+
+```bash
+git clone https://github.com/seu-usuario/seu-repositorio.git
+cd seu-repositorio
+```
+
+# Instale as dependências
+
+npm install
+
+### ou
+
+yarn install
+
+### ou
+
+pnpm install
+
+### ou
+
+bun install
+
+# Configure as variáveis de ambiente
+
+# Banco de dados (PostgreSQL)
+
+DATABASE_URL="postgresql://usuario:senha@localhost:5432/nome_do_banco"
+
+# Autenticação (exemplo com NextAuth – ajuste conforme sua implementação)
+
+NEXTAUTH_SECRET="seu-segredo-aqui"
+NEXTAUTH_URL="http://localhost:3000"
+
+# Opcional: chaves de gateway de pagamento, serviços externos etc.
+
+# Execute as migrations do Prisma
+
+```bash
+npx prisma migrate dev --name init
+```
+
+# Gere o cliente Prisma (executado automaticamente no migrate)
+
+```bash
+npx prisma generate
+```
+
+# Inicie o servidor de desenvolvimento
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-## Other instalations
+## Comandos úteis do Prisma
 
-- shadcn: https://ui.shadcn.com/
-- React Hook Form: https://react-hook-form.com/get-started
+### Criar nova migration
 
 ```bash
-npx shadcn@latest init
+npx prisma migrate dev --name nome_da_mudanca
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Gerar cliente Prisma
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-# About the project
-
-### stup e instalação do prisma
-
-npm install prisma @prisma/client
-npx prisma init
-
-### Geração do client (quando há mudança no schema)
-
+```bash
 npx prisma generate
+```
 
-### Criação de migrations
+### Abrir interface visual do banco
 
-npx prisma migrate dev --name nome_da_mudanca
-Exemplo
-npx prisma migrate dev --name create_estoque
-npx prisma migrate dev --name add_preco
+```bash
+npx prisma studio (ou npx prisma studio --port 5556)
+```
 
-### Visualização do banco
+### Resetar banco e aplicar migrations
 
-npx prisma studio
-ou mudar porta
-npx prisma studio --port 5556
-
-### Reiniciar TS no vscode
-
-Ctrl + Shift + P
-→ TypeScript: Restart TS Server
+```bash
+npx prisma migrate reset
+```
