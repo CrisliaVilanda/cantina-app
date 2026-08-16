@@ -6,16 +6,25 @@ datasource db {
   provider = "postgresql"
 }
 
+// ============================================================
+// ESTOQUE
+// ============================================================
+
 model Estoque {
-  id                  String     @id @default(uuid())
+  id                  String   @id @default(uuid())
   produto             String
   unidadeMedida       String
   quantidadeAdquirida Int
-  quantidadeSaidas    Int
-  preco               Decimal    @db.Decimal(10, 2)
-  dataAquisicao       DateTime   @default(now())
-  cardapios           Cardapio[]
+  quantidadeSaidas    Int      @default(0)
+  preco               Decimal  @db.Decimal(10, 2)
+  dataAquisicao       DateTime @default(now())
+
+  cardapios Cardapio[]
 }
+
+// ============================================================
+// CARDÁPIO
+// ============================================================
 
 model Cardapio {
   id String @id @default(uuid())
@@ -31,30 +40,93 @@ model Cardapio {
   ativo Boolean @default(true)
 
   estoqueId String
-
-  estoque Estoque @relation(fields: [estoqueId], references: [id])
+  estoque   Estoque @relation(fields: [estoqueId], references: [id])
 
   vendas Venda[]
+
+  itensPedido PedidoItem[]
 
   previsoes PrevisaoVenda[]
 
   createdAt DateTime @default(now())
 }
 
+// ============================================================
+// STATUS DO PEDIDO
+// ============================================================
+
+enum PedidoStatus {
+  PENDENTE
+  PREPARO
+  PRONTO
+  ENTREGUE
+}
+
+// ============================================================
+// PEDIDO
+// ============================================================
+
+model Pedido {
+  id String @id @default(uuid())
+
+  cliente String
+
+  status PedidoStatus @default(PENDENTE)
+
+  total Decimal @db.Decimal(10, 2)
+
+  createdAt DateTime @default(now())
+
+  itens PedidoItem[]
+
+  vendas Venda[]
+}
+
+// ============================================================
+// ITENS DO PEDIDO
+// ============================================================
+
+model PedidoItem {
+  id String @id @default(uuid())
+
+  pedidoId String
+  pedido   Pedido @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+
+  cardapioId String
+  cardapio   Cardapio @relation(fields: [cardapioId], references: [id])
+
+  quantidade Int
+
+  precoUnitario Decimal @db.Decimal(10, 2)
+
+  subtotal Decimal @db.Decimal(10, 2)
+
+  createdAt DateTime @default(now())
+}
+
+// ============================================================
+// VENDA
+// ============================================================
+
 model Venda {
   id String @id @default(uuid())
 
   cardapioId String
-  quantidade Int
-  total      Decimal @db.Decimal(10, 2)
+  cardapio   Cardapio @relation(fields: [cardapioId], references: [id])
 
-  pedidoId String
-  pedido   Pedido @relation(fields: [pedidoId], references: [id])
+  pedidoId String?
+  pedido   Pedido? @relation(fields: [pedidoId], references: [id])
+
+  quantidade Int
+
+  total Decimal @db.Decimal(10, 2)
 
   createdAt DateTime @default(now())
-
-  cardapio Cardapio @relation(fields: [cardapioId], references: [id])
 }
+
+// ============================================================
+// SALDO DIÁRIO
+// ============================================================
 
 model SaldoDiario {
   id String @id @default(uuid())
@@ -66,26 +138,13 @@ model SaldoDiario {
   totalArrecadado Decimal @db.Decimal(10, 2)
 
   createdAt DateTime @default(now())
+
   updatedAt DateTime @updatedAt
 }
 
-enum PedidoStatus {
-  PENDENTE
-  PREPARO
-  PRONTO
-  ENTREGUE
-}
-
-model Pedido {
-  id      String  @id @default(uuid())
-  cliente String
-  status  String
-  total   Decimal @db.Decimal(10, 2)
-
-  createdAt DateTime @default(now())
-
-  itens Venda[]
-}
+// ============================================================
+// RELATÓRIO MENSAL
+// ============================================================
 
 model RelatorioMensal {
   id String @id @default(uuid())
@@ -101,6 +160,10 @@ model RelatorioMensal {
   createdAt DateTime @default(now())
 }
 
+// ============================================================
+// HISTÓRICO DE ESTOQUE
+// ============================================================
+
 model HistoricoEstoque {
   id String @id @default(uuid())
 
@@ -109,6 +172,10 @@ model HistoricoEstoque {
 
   createdAt DateTime @default(now())
 }
+
+// ============================================================
+// PREVISÃO DE VENDAS
+// ============================================================
 
 model PrevisaoVenda {
   id String @id @default(uuid())
@@ -123,6 +190,10 @@ model PrevisaoVenda {
   cardapio Cardapio @relation(fields: [cardapioId], references: [id])
 }
 
+// ============================================================
+// CAIXA
+// ============================================================
+
 model Caixa {
   id String @id @default(uuid())
 
@@ -133,6 +204,10 @@ model Caixa {
 
   createdAt DateTime @default(now())
 }
+
+// ============================================================
+// DESPESAS
+// ============================================================
 
 model Despesa {
   id String @id @default(uuid())
@@ -146,21 +221,45 @@ model Despesa {
   createdAt DateTime @default(now())
 }
 
+// ============================================================
+// USUÁRIOS
+// ============================================================
+
+enum PerfilUsuario {
+  ADMIN
+  ATENDENTE
+}
+
 model Usuario {
   id String @id @default(uuid())
 
-  nome  String
-  email String @unique
-  senha String
+  nomeCompleto String
 
-  role String
+  usuario String @unique
+
+  senhaHash String
+
+  perfil PerfilUsuario
+
+  ativo Boolean @default(true)
+
+  ultimoLogin DateTime?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
 }
+
+// ============================================================
+// LOG DO SISTEMA
+// ============================================================
 
 model LogSistema {
   id String @id @default(uuid())
 
   usuario String
-  acao    String
+
+  acao String
 
   createdAt DateTime @default(now())
 }
