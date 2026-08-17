@@ -63,17 +63,36 @@ enum PedidoStatus {
 }
 
 // ============================================================
+// FORMAS DE PAGAMENTO
+// ============================================================
+
+enum FormaPagamento {
+  PIX
+  CREDITO
+  DEBITO
+  DINHEIRO
+}
+
+// ============================================================
 // PEDIDO
 // ============================================================
 
 model Pedido {
   id String @id @default(uuid())
 
+  numero Int @unique @default(autoincrement())
+
   cliente String
 
   status PedidoStatus @default(PENDENTE)
 
+  formaPagamento FormaPagamento
+
   total Decimal @db.Decimal(10, 2)
+
+  valorRecebido Decimal? @db.Decimal(10, 2)
+
+  troco Decimal? @db.Decimal(10, 2)
 
   createdAt DateTime @default(now())
 

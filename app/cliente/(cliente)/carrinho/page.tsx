@@ -8,6 +8,13 @@ import { useState } from "react";
 import { useClient } from "@/app/cliente/context/ClientContext";
 import { confirmarPedido } from "@/app/actions/pedido.actions";
 
+type FormaPagamento =
+  | "PIX"
+  | "CREDITO"
+  | "DEBITO"
+  | "DINHEIRO"
+  | "";
+
 export default function CarrinhoPage() {
   const router = useRouter();
 
@@ -22,39 +29,46 @@ export default function CarrinhoPage() {
 
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState("");
+  const [formaPagamento, setFormaPagamento] = useState<FormaPagamento>("");
 
   async function handleConfirmarPedido() {
-    if (!nomeCliente) {
-      setErro(
-        "Nome do cliente não encontrado."
-      );
+    setErro("");
+
+    if (!nomeCliente?.trim()) {
+      setErro("Nome do cliente não encontrado.");
       return;
     }
 
     if (carrinho.length === 0) {
-      setErro(
-        "Adicione pelo menos um item ao pedido."
-      );
+      setErro("Adicione pelo menos um item ao pedido.");
+      return;
+    }
+
+
+    if (!formaPagamento) {
+      setErro("Selecione uma forma de pagamento.");
       return;
     }
 
     setEnviando(true);
-    setErro("");
 
     try {
-      const resultado =
-        await confirmarPedido({
-          cliente: nomeCliente,
-          itens: carrinho.map((item) => ({
-            cardapioId: item.id,
-            quantidade: item.quantidade,
-          })),
-        });
+      const resultado = await confirmarPedido({
+        cliente: nomeCliente,
+        formaPagamento,
+        itens: carrinho.map((item) => ({
+          cardapioId: item.id,
+          quantidade: item.quantidade,
+        })),
+      });
 
       if (!resultado.success) {
-        throw new Error(
+        setErro(
+          resultado.error ||
           "Não foi possível confirmar o pedido."
         );
+
+        return;
       }
 
       limparCarrinho();
@@ -63,6 +77,8 @@ export default function CarrinhoPage() {
         `/cliente/pedido/${resultado.pedidoId}`
       );
     } catch (error) {
+      console.error("Erro ao confirmar pedido:", error);
+
       setErro(
         error instanceof Error
           ? error.message
@@ -139,6 +155,7 @@ export default function CarrinhoPage() {
                       )
                     }
                     className="rounded-md border p-2 hover:bg-muted disabled:opacity-50"
+                    aria-label={`Diminuir quantidade de ${item.nome}`}
                   >
                     <Minus className="h-4 w-4" />
                   </button>
@@ -157,6 +174,7 @@ export default function CarrinhoPage() {
                       )
                     }
                     className="rounded-md border p-2 hover:bg-muted disabled:opacity-50"
+                    aria-label={`Aumentar quantidade de ${item.nome}`}
                   >
                     <Plus className="h-4 w-4" />
                   </button>
@@ -168,6 +186,7 @@ export default function CarrinhoPage() {
                       removerDoCarrinho(item.id)
                     }
                     className="rounded-md p-2 text-red-500 hover:bg-red-50 disabled:opacity-50"
+                    aria-label={`Remover ${item.nome} do carrinho`}
                   >
                     <Trash2 className="h-5 w-5" />
                   </button>
@@ -189,7 +208,10 @@ export default function CarrinhoPage() {
       </div>
 
       {erro && (
-        <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+        <div
+          role="alert"
+          className="mt-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700"
+        >
           {erro}
         </div>
       )}
@@ -203,6 +225,89 @@ export default function CarrinhoPage() {
           <span className="text-2xl font-bold">
             R$ {totalCarrinho.toFixed(2)}
           </span>
+        </div>
+        <div className="mt-6">
+          <h2 className="text-lg font-semibold">
+            Forma de pagamento
+          </h2>
+
+          <p className="mt-1 text-sm text-muted-foreground">
+            Selecione como você deseja pagar.
+          </p>
+
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <button
+              type="button"
+              onClick={() => setFormaPagamento("PIX")}
+              disabled={enviando}
+              className={`rounded-lg border p-4 text-left transition ${formaPagamento === "PIX"
+                ? "border-blue-500 bg-blue-50 ring-2 ring-blue-500"
+                : "hover:bg-muted"
+                }`}
+            >
+              <p className="font-semibold">
+                PIX
+              </p>
+
+              <p className="text-sm text-muted-foreground">
+                Pagamento via PIX
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setFormaPagamento("CREDITO")}
+              disabled={enviando}
+              className={`rounded-lg border p-4 text-left transition ${formaPagamento === "CREDITO"
+                ? "border-blue-500 bg-blue-50 ring-2 ring-blue-500"
+                : "hover:bg-muted"
+                }`}
+            >
+              <p className="font-semibold">
+                Cartão de crédito
+              </p>
+
+              <p className="text-sm text-muted-foreground">
+                Pagamento no crédito
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setFormaPagamento("DEBITO")}
+              disabled={enviando}
+              className={`rounded-lg border p-4 text-left transition ${formaPagamento === "DEBITO"
+                ? "border-blue-500 bg-blue-50 ring-2 ring-blue-500"
+                : "hover:bg-muted"
+                }`}
+            >
+              <p className="font-semibold">
+                Cartão de débito
+              </p>
+
+              <p className="text-sm text-muted-foreground">
+                Pagamento no débito
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setFormaPagamento("DINHEIRO")}
+              disabled={enviando}
+              className={`rounded-lg border p-4 text-left transition ${formaPagamento === "DINHEIRO"
+                ? "border-blue-500 bg-blue-50 ring-2 ring-blue-500"
+                : "hover:bg-muted"
+                }`}
+            >
+              <p className="font-semibold">
+                Dinheiro
+              </p>
+
+              <p className="text-sm text-muted-foreground">
+                Pagamento em espécie
+              </p>
+            </button>
+          </div>
         </div>
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">

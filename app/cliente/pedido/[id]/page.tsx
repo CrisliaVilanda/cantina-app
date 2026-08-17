@@ -80,14 +80,14 @@ export default async function PedidoPage({
 
                 <p className="text-sm text-muted-foreground">
                   {item.quantidade}x R${" "}
-                  {Number(item.preco).toFixed(2)}
+                  {Number(item.precoUnitario).toFixed(2)} cada
                 </p>
               </div>
 
               <span className="font-semibold">
                 R${" "}
                 {(
-                  Number(item.preco) *
+                  Number(item.precoUnitario) *
                   item.quantidade
                 ).toFixed(2)}
               </span>
