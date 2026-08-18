@@ -5,7 +5,7 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { useClient } from "@/app/cliente/context/ClientContext";
+import { useClient } from "@/app/cliente/(cliente)/context/ClientContext";
 import { confirmarPedido } from "@/app/actions/pedido.actions";
 
 type FormaPagamento =
@@ -39,7 +39,7 @@ export default function CarrinhoPage() {
       return;
     }
 
-    if (carrinho.length === 0) {
+    if (carrinho.length === 0 && !enviando) {
       setErro("Adicione pelo menos um item ao pedido.");
       return;
     }
@@ -62,20 +62,15 @@ export default function CarrinhoPage() {
         })),
       });
 
-      if (!resultado.success) {
-        setErro(
-          resultado.error ||
-          "Não foi possível confirmar o pedido."
+      if (!resultado.success || !resultado.pedidoId) {
+        throw new Error(
+          resultado.error ?? "Não foi possível confirmar o pedido."
         );
-
-        return;
       }
 
       limparCarrinho();
 
-      router.push(
-        `/cliente/pedido/${resultado.pedidoId}`
-      );
+      router.replace(`/cliente/pedido/${resultado.pedidoId}`);
     } catch (error) {
       console.error("Erro ao confirmar pedido:", error);
 
@@ -87,6 +82,21 @@ export default function CarrinhoPage() {
     } finally {
       setEnviando(false);
     }
+  }
+  if (enviando) {
+    return (
+      <div className="mx-auto flex min-h-[60vh] max-w-2xl flex-col items-center justify-center text-center">
+        <div className="mb-6 h-10 w-10 animate-spin rounded-full border-4 border-muted border-t-primary" />
+
+        <h1 className="text-2xl font-bold">
+          Confirmando seu pedido...
+        </h1>
+
+        <p className="mt-2 text-muted-foreground">
+          Aguarde enquanto registramos seu pedido.
+        </p>
+      </div>
+    );
   }
 
   if (carrinho.length === 0) {

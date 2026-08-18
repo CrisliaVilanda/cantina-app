@@ -1,6 +1,6 @@
 import Footer from "@/app/components/Footer";
 import Header from "@/app/components/Header";
-import { ClientProvider } from "./context/ClientContext";
+import { ClientProvider } from "@/app/cliente/(cliente)/context/ClientContext";
 
 export default function ClientLayout({
   children,

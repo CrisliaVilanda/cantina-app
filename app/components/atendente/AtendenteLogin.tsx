@@ -45,7 +45,7 @@ export default function LoginForm() {
 
       {/* LADO ESQUERDO */}
 
-      <div className="hidden md:flex items-center justify-center bg-primary">
+      <div className="hidden md:flex items-center justify-center">
 
         <Image
           src="/globe.svg"

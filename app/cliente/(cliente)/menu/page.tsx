@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useClient } from "@/app/cliente/context/ClientContext";
+import { useClient } from "@/app/cliente/(cliente)/context/ClientContext";
 
 type CardapioItem = {
   id: string;
