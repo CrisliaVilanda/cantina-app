@@ -9,7 +9,7 @@ export default function ClientPage() {
 
   const {
     nomeCliente,
-    definirNomeCliente,
+    setNomeCliente,
   } = useClient();
 
   const [nome, setNome] = useState(nomeCliente);
@@ -21,7 +21,7 @@ export default function ClientPage() {
       return;
     }
 
-    definirNomeCliente(nomeLimpo);
+    setNomeCliente(nomeLimpo);
 
     router.push("/cliente/menu");
   }

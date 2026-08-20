@@ -17,139 +17,92 @@ type ItemCarrinho = {
 
 type ClientContextType = {
   nomeCliente: string;
-
-  definirNomeCliente: (nome: string) => void;
+  setNomeCliente: (nome: string) => void;
 
   carrinho: ItemCarrinho[];
 
-  adicionarAoCarrinho: (item: {
-    id: string;
-    nome: string;
-    preco: number;
-  }) => void;
-
-  alterarQuantidade: (
-    id: string,
-    quantidade: number
-  ) => void;
-
+  adicionarAoCarrinho: (item: ItemCarrinho) => void;
+  alterarQuantidade: (id: string, quantidade: number) => void;
   removerDoCarrinho: (id: string) => void;
-
   limparCarrinho: () => void;
 
   totalCarrinho: number;
+
+  sessaoCarregada: boolean;
+
+  pedidoEmProcessamento: boolean;
+  setPedidoEmProcessamento: (valor: boolean) => void;
 };
 
-const ClientContext = createContext<
-  ClientContextType | undefined
->(undefined);
-
-const NOME_STORAGE = "cliente_nome";
-const CARRINHO_STORAGE = "cliente_carrinho";
+const ClientContext = createContext<ClientContextType | undefined>(
+  undefined
+);
 
 export function ClientProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [nomeCliente, setNomeCliente] =
-    useState<string>("");
+  const [nomeCliente, setNomeCliente] = useState("");
+  const [carrinho, setCarrinho] = useState<ItemCarrinho[]>([]);
 
-  const [carrinho, setCarrinho] =
-    useState<ItemCarrinho[]>([]);
+  const [sessaoCarregada, setSessaoCarregada] = useState(false);
 
-  // Recupera os dados armazenados na sessão
+  const [pedidoEmProcessamento, setPedidoEmProcessamento] =
+    useState(false);
+
   useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
+    try {
+      const nomeSalvo = localStorage.getItem("nomeCliente");
 
-    const nomeSalvo =
-      window.sessionStorage.getItem(NOME_STORAGE);
-
-    const carrinhoSalvo =
-      window.sessionStorage.getItem(
-        CARRINHO_STORAGE
-      );
-
-    if (nomeSalvo !== null) {
-      setNomeCliente(nomeSalvo);
-    }
-
-    if (carrinhoSalvo !== null) {
-      try {
-        const dados: unknown =
-          JSON.parse(carrinhoSalvo);
-
-        if (Array.isArray(dados)) {
-          setCarrinho(
-            dados as ItemCarrinho[]
-          );
-        }
-      } catch {
-        window.sessionStorage.removeItem(
-          CARRINHO_STORAGE
-        );
+      if (nomeSalvo) {
+        setNomeCliente(nomeSalvo);
       }
+
+      const carrinhoSalvo = localStorage.getItem("carrinho");
+
+      if (carrinhoSalvo) {
+        try {
+          const carrinhoConvertido = JSON.parse(carrinhoSalvo);
+
+          if (Array.isArray(carrinhoConvertido)) {
+            setCarrinho(carrinhoConvertido);
+          }
+        } catch {
+          localStorage.removeItem("carrinho");
+        }
+      }
+    } finally {
+      setSessaoCarregada(true);
     }
   }, []);
 
-  // Salva o nome na sessão
   useEffect(() => {
-    if (typeof window === "undefined") {
+    if (!sessaoCarregada) {
       return;
     }
 
-    if (nomeCliente.trim()) {
-      window.sessionStorage.setItem(
-        NOME_STORAGE,
-        nomeCliente
-      );
-    }
-  }, [nomeCliente]);
+    localStorage.setItem(
+      "nomeCliente",
+      nomeCliente
+    );
+  }, [nomeCliente, sessaoCarregada]);
 
-  // Salva o carrinho na sessão
   useEffect(() => {
-    if (typeof window === "undefined") {
+    if (!sessaoCarregada) {
       return;
     }
 
-    window.sessionStorage.setItem(
-      CARRINHO_STORAGE,
+    localStorage.setItem(
+      "carrinho",
       JSON.stringify(carrinho)
     );
-  }, [carrinho]);
+  }, [carrinho, sessaoCarregada]);
 
-  function definirNomeCliente(nome: string) {
-    const nomeLimpo = nome.trim();
-
-    setNomeCliente(nomeLimpo);
-
-    if (
-      typeof window !== "undefined"
-    ) {
-      if (nomeLimpo) {
-        window.sessionStorage.setItem(
-          NOME_STORAGE,
-          nomeLimpo
-        );
-      } else {
-        window.sessionStorage.removeItem(
-          NOME_STORAGE
-        );
-      }
-    }
-  }
-
-  function adicionarAoCarrinho(item: {
-    id: string;
-    nome: string;
-    preco: number;
-  }) {
+  function adicionarAoCarrinho(item: ItemCarrinho) {
     setCarrinho((atual) => {
       const existente = atual.find(
-        (produto) =>
-          produto.id === item.id
+        (produto) => produto.id === item.id
       );
 
       if (existente) {
@@ -158,21 +111,13 @@ export function ClientProvider({
             ? {
               ...produto,
               quantidade:
-                produto.quantidade + 1,
+                produto.quantidade + item.quantidade,
             }
             : produto
         );
       }
 
-      return [
-        ...atual,
-        {
-          id: item.id,
-          nome: item.nome,
-          preco: item.preco,
-          quantidade: 1,
-        },
-      ];
+      return [...atual, item];
     });
   }
 
@@ -199,58 +144,55 @@ export function ClientProvider({
 
   function removerDoCarrinho(id: string) {
     setCarrinho((atual) =>
-      atual.filter(
-        (item) => item.id !== id
-      )
+      atual.filter((item) => item.id !== id)
     );
   }
 
   function limparCarrinho() {
     setCarrinho([]);
-
-    if (
-      typeof window !== "undefined"
-    ) {
-      window.sessionStorage.removeItem(
-        CARRINHO_STORAGE
-      );
-    }
+    localStorage.removeItem("carrinho");
   }
 
   const totalCarrinho = useMemo(() => {
     return carrinho.reduce(
       (total, item) =>
-        total +
-        item.preco * item.quantidade,
+        total + item.preco * item.quantidade,
       0
     );
   }, [carrinho]);
 
-  const value: ClientContextType = {
-    nomeCliente,
-    definirNomeCliente,
-    carrinho,
-    adicionarAoCarrinho,
-    alterarQuantidade,
-    removerDoCarrinho,
-    limparCarrinho,
-    totalCarrinho,
-  };
-
   return (
-    <ClientContext.Provider value={value}>
+    <ClientContext.Provider
+      value={{
+        nomeCliente,
+        setNomeCliente,
+
+        carrinho,
+
+        adicionarAoCarrinho,
+        alterarQuantidade,
+        removerDoCarrinho,
+        limparCarrinho,
+
+        totalCarrinho,
+
+        sessaoCarregada,
+
+        pedidoEmProcessamento,
+        setPedidoEmProcessamento,
+      }}
+    >
       {children}
     </ClientContext.Provider>
   );
 }
 
 export function useClient() {
-  const context =
-    useContext(ClientContext);
+  const context = useContext(ClientContext);
 
   if (!context) {
     throw new Error(
-      "useClient deve ser utilizado dentro de ClientProvider"
+      "useClient deve ser usado dentro de ClientProvider"
     );
   }
 

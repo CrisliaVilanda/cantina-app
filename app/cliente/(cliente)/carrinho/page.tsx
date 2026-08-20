@@ -25,6 +25,9 @@ export default function CarrinhoPage() {
     alterarQuantidade,
     removerDoCarrinho,
     limparCarrinho,
+    sessaoCarregada,
+    pedidoEmProcessamento,
+    setPedidoEmProcessamento,
   } = useClient();
 
   const [enviando, setEnviando] = useState(false);
@@ -39,10 +42,13 @@ export default function CarrinhoPage() {
       return;
     }
 
-    if (carrinho.length === 0 && !enviando) {
+    if (carrinho.length === 0) {
       setErro("Adicione pelo menos um item ao pedido.");
       return;
     }
+    setEnviando(true);
+    setPedidoEmProcessamento(true);
+    setErro("");
 
 
     if (!formaPagamento) {
@@ -64,15 +70,18 @@ export default function CarrinhoPage() {
 
       if (!resultado.success || !resultado.pedidoId) {
         throw new Error(
-          resultado.error ?? "Não foi possível confirmar o pedido."
+          resultado.error ??
+          "Não foi possível confirmar o pedido."
         );
       }
 
       limparCarrinho();
 
-      router.replace(`/cliente/pedido/${resultado.pedidoId}`);
+      router.push(
+        `/cliente/pedido/${resultado.pedidoId}`
+      );
     } catch (error) {
-      console.error("Erro ao confirmar pedido:", error);
+      setPedidoEmProcessamento(false);
 
       setErro(
         error instanceof Error
@@ -98,8 +107,21 @@ export default function CarrinhoPage() {
       </div>
     );
   }
+  if (!sessaoCarregada) {
+    return (
+      <div className="mx-auto flex min-h-[60vh] max-w-2xl items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
 
-  if (carrinho.length === 0) {
+          <p className="text-muted-foreground">
+            Carregando seu pedido...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (sessaoCarregada && carrinho.length === 0 && !pedidoEmProcessamento) {
     return (
       <div className="mx-auto flex min-h-[60vh] max-w-2xl flex-col items-center justify-center text-center">
         <h1 className="text-3xl font-bold">
@@ -107,8 +129,7 @@ export default function CarrinhoPage() {
         </h1>
 
         <p className="mt-3 text-muted-foreground">
-          Adicione alguns itens do cardápio para
-          continuar.
+          Adicione alguns itens do cardápio para continuar.
         </p>
 
         <Link
@@ -122,7 +143,7 @@ export default function CarrinhoPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="relative mx-auto max-w-4xl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">
           Meu pedido
@@ -332,13 +353,31 @@ export default function CarrinhoPage() {
             type="button"
             disabled={enviando}
             onClick={handleConfirmarPedido}
-            className="flex-1 rounded-md bg-green-600 px-4 py-3 font-semibold text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex-1 rounded-md bg-green-600 px-4 py-3 
+            font-semibold text-white transition-colors hover:bg-green-700 
+            disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {enviando
-              ? "Enviando pedido..."
-              : "Confirmar pedido"}
+            Confirmar pedido
+
           </button>
         </div>
+        {pedidoEmProcessamento && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-300">
+            <div className="flex flex-col items-center gap-4 rounded-2xl border bg-card px-8 py-7 shadow-xl animate-in fade-in zoom-in-95 duration-300">
+              <div className="h-10 w-10 animate-spin rounded-full border-4 border-muted border-t-primary" />
+
+              <div className="text-center">
+                <p className="text-lg font-semibold">
+                  Processando pedido...
+                </p>
+
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Aguarde um momento.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
