@@ -1,4 +1,4 @@
-import AtendenteLogin from "@/app/components/atendente/AtendenteLogin";
+import AtendenteLogin from "@/app/components/admin/AtendenteLogin";
 
 
 export default function LoginAtendente() {

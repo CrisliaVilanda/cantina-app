@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { ComndsListCards } from "../../../components/ComndsListCards";
+import { ComndsListCards } from "../../../components/admin/ComndsListCards";
 
 export default async function CommandPainel() {
   const pedidos = await prisma.pedido.findMany({

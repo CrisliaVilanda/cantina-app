@@ -1,4 +1,4 @@
-import CommandDetail from "@/app/components/commandDetail";
+import CommandDetail from "@/app/components/admin/commandDetail";
 
 type CommanDetailPageParams = {
   params : Promise<{

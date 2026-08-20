@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Footer from "@/app/components/Footer";
-import HeaderAdmin from "@/app/components/HeaaderAdmin";
-import Sidebar from "@/app/components/Sidebar";
+import HeaderAdmin from "@/app/components/admin/HeaaderAdmin";
+import Sidebar from "@/app/components/admin/Sidebar";
 
 export default function AdminLayout({
   children,
@@ -15,14 +15,10 @@ export default function AdminLayout({
   return (
     <div className="flex min-h-screen">
 
+      <Sidebar sidebarOpen={sidebarOpen} />
 
-      <aside
-        className={`transition-all duration-500 ${sidebarOpen ? "w-64" : "w-16"}`}>
-        <Sidebar sidebarOpen={sidebarOpen} />
-      </aside>
-
-      <div className="flex flex-col flex-1">
-        <HeaderAdmin toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <HeaderAdmin toggleSidebar={() => setSidebarOpen((current) => !current)} />
         <main className="flex-1 p-6">
           {children}
         </main>

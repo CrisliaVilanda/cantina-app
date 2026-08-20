@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { ThemeToggle } from "./ThemeTogle";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
-
+import { ThemeToggle } from "@/app/components/ThemeTogle";
 
 type HeaderProps = {
   toggleSidebar?: () => void;
