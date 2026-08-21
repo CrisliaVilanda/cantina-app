@@ -45,13 +45,8 @@ export const adminMenu: MenuItem[] = [
     icon: Package,
     children: [
       {
-        title: "Visão geral",
-        href: "/admin/estoque",
-        icon: Package,
-      },
-      {
-        title: "Produtos",
-        href: "/admin/estoque/produtos",
+        title: "Dispensa - visão geral",
+        href: "/admin/estoque/dispensa",
         icon: Package,
       },
       {

@@ -7,19 +7,33 @@ datasource db {
 }
 
 // ============================================================
-// ESTOQUE
+// ESTOQUE / Dispensa
 // ============================================================
 
 model Estoque {
   id                  String   @id @default(uuid())
   produto             String
+  Categoria           String
   unidadeMedida       String
-  quantidadeAdquirida Int
-  quantidadeSaidas    Int      @default(0)
-  preco               Decimal  @db.Decimal(10, 2)
-  dataAquisicao       DateTime @default(now())
+  quantidadeAtal Int
+  estoqueMinimo    Int      @default(0)
+  custoUnitario               Decimal  @db.Decimal(10, 2)
+  createAt       DateTime @default(now())
+  UpdateAt        DateTime @default(updatedAt())
 
   cardapios Cardapio[]
+}
+
+// MOVIMENTAÇÕES
+
+model MovimentaçãoEstoque {
+id
+produto
+tipo
+quantidadeEntrada
+valorEntrada
+dataEntrada
+
 }
 
 // ============================================================

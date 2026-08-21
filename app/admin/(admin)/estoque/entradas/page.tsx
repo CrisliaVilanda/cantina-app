@@ -30,12 +30,12 @@ export default async function EstoquePage() {
     <div className="container mx-auto px-4 py-4">
       <div className="flex justify-between items-center mb-6">
         <div className="space-y-2">
-          <h1 className="text-3xl font-semibold">Estoque de alimentos</h1>
+          <h1 className="text-3xl font-semibold">Entradas</h1>
           <h3 className="text-xl font-light">Controle de estoque</h3>
         </div>
 
         <BotaoDeAcao
-          textoBotao="Adicionar item ao estoque"
+          textoBotao="Adicionar produto à dispensa"
           linkBotao="/admin/estoque/new"
         />
       </div>
