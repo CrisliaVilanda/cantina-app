@@ -1,107 +1,134 @@
-import BotaoDeAcao from "@/app/components/BotaoDeLink";
-import { listarEstoque, EstoqueItem } from "@/app/services/estoque.services";
-
-function formatarData(data: Date | string | null | undefined): string {
-  if (!data) return "—";
-
-  const date = new Date(data);
-  if (isNaN(date.getTime())) return "Data inválida";
-
-  return date.toLocaleDateString("pt-BR");
-}
-
-function numeroSeguro(valor: number | null | undefined): number {
-  if (typeof valor !== "number" || isNaN(valor)) return 0;
-  return valor;
-}
+import { obterProdutosComEstoque } from "@/lib/estoque";
 
 export default async function EstoquePage() {
-  let itens: EstoqueItem[] = [];
-  let erro = false;
+  const produtos =
+    await obterProdutosComEstoque();
 
-  try {
-    itens = await listarEstoque();
-  } catch (e) {
-    console.error("Erro ao buscar estoque:", e);
-    erro = true;
-  }
+  const produtosBaixo = produtos.filter(
+    (produto) => produto.estoqueBaixo
+  );
 
   return (
-    <div className="container mx-auto px-4 py-4">
-      <div className="flex justify-between items-center mb-6">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-semibold">Entradas</h1>
-          <h3 className="text-xl font-light">Controle de estoque</h3>
-        </div>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold">
+          Estoque
+        </h1>
 
-        <BotaoDeAcao
-          textoBotao="Adicionar produto à dispensa"
-          linkBotao="/admin/estoque/new"
-        />
+        <p className="mt-1 text-muted-foreground">
+          Controle de produtos e insumos da cantina.
+        </p>
       </div>
 
-      {erro && (
-        <div className="mb-4 p-4 bg-red-100 text-red-700 rounded">
-          Erro ao carregar os dados do estoque.
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="rounded-xl border bg-card p-5">
+          <p className="text-sm text-muted-foreground">
+            Produtos cadastrados
+          </p>
+
+          <p className="mt-2 text-3xl font-bold">
+            {produtos.length}
+          </p>
         </div>
-      )}
 
-      <div className="overflow-x-auto">
-        <table className="w-full border border-gray-100 rounded-lg">
-          <thead className="bg-blue-800 text-white text-left">
-            <tr>
-              <th className="p-3">Produto</th>
-              <th className="p-3">Unidade</th>
-              <th className="p-3">Preço</th>
-              <th className="p-3">Qtd. adquirida</th>
-              <th className="p-3">Data</th>
-              <th className="p-3">Saídas</th>
-              <th className="p-3">Restante</th>
-            </tr>
-          </thead>
+        <div className="rounded-xl border bg-card p-5">
+          <p className="text-sm text-muted-foreground">
+            Estoque baixo
+          </p>
 
-          <tbody>
-            {!erro && itens.length === 0 && (
-              <tr>
-                <td colSpan={6} className="p-4 text-center text-gray-500">
-                  Nenhum item cadastrado
-                </td>
-              </tr>
-            )}
+          <p className="mt-2 text-3xl font-bold text-orange-500">
+            {produtosBaixo.length}
+          </p>
+        </div>
 
-            {!erro &&
-              itens.map((item) => {
-                const adquirida = numeroSeguro(item.quantidadeAdquirida);
-                const saidas = numeroSeguro(item.quantidadeSaidas);
-                const restante =
-                  numeroSeguro(item.quantidadeRestante);
+        <div className="rounded-xl border bg-card p-5">
+          <p className="text-sm text-muted-foreground">
+            Produtos ativos
+          </p>
 
-                return (
-                  <tr
-                    key={item.id}
-                    className="border-t hover:bg-gray-50 transition"
-                  >
-                    <td className="p-3">{item.produto || "—"}</td>
-                    <td className="p-3">{item.unidadeMedida || "—"}</td>
-                    <td className="p-3">
-                      {item.preco.toLocaleString("pt-BR", {
-                        style: "currency",
-                        currency: "BRL",
-                      })}
-                    </td>
-                    <td className="p-3">{adquirida}</td>
-                    <td className="p-3">
-                      {formatarData(item.dataAquisicao)}
-                    </td>
-                    <td className="p-3">{saidas}</td>
-                    <td className="p-3 font-semibold">
-                      {restante}
-                    </td>
-                  </tr>
-                );
-              })}
-          </tbody>
-        </table>
+          <p className="mt-2 text-3xl font-bold text-green-600">
+            {
+              produtos.filter(
+                (produto) => produto.ativo
+              ).length
+            }
+          </p>
+        </div>
+      </div>
+
+      <div className="rounded-xl border bg-card">
+        <div className="border-b p-5">
+          <h2 className="text-lg font-semibold">
+            Situação do estoque
+          </h2>
+        </div>
+
+        {produtos.length === 0 ? (
+          <div className="p-8 text-center text-muted-foreground">
+            Nenhum produto cadastrado.
+          </div>
+        ) : (
+          <div className="divide-y">
+            {produtos.map((produto) => (
+              <div
+                key={produto.id}
+                className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div>
+                  <p className="font-semibold">
+                    {produto.nome}
+                  </p>
+
+                  <p className="text-sm text-muted-foreground">
+                    {produto.categoria} ·{" "}
+                    {produto.unidadeMedida}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-6">
+                  <div>
+                    <p className="text-xs text-muted-foreground">
+                      Estoque atual
+                    </p>
+
+                    <p
+                      className={`font-semibold ${produto.estoqueBaixo
+                          ? "text-orange-500"
+                          : "text-green-600"
+                        }`}
+                    >
+                      {produto.estoqueAtual}{" "}
+                      {produto.unidadeMedida}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs text-muted-foreground">
+                      Mínimo
+                    </p>
+
+                    <p className="font-semibold">
+                      {produto.estoqueMinimo}{" "}
+                      {produto.unidadeMedida}
+                    </p>
+                  </div>
+
+                  <div>
+                    {produto.estoqueBaixo ? (
+                      <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-700 dark:bg-orange-950 dark:text-orange-300">
+                        Estoque baixo
+                      </span>
+                    ) : (
+                      <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700 dark:bg-green-950 dark:text-green-300">
+                        Normal
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

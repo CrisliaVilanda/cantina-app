@@ -7,33 +7,57 @@ datasource db {
 }
 
 // ============================================================
-// ESTOQUE / Dispensa
+// PRODUTOS / INSUMOS
 // ============================================================
 
-model Estoque {
-  id                  String   @id @default(uuid())
-  produto             String
-  Categoria           String
-  unidadeMedida       String
-  quantidadeAtal Int
-  estoqueMinimo    Int      @default(0)
-  custoUnitario               Decimal  @db.Decimal(10, 2)
-  createAt       DateTime @default(now())
-  UpdateAt        DateTime @default(updatedAt())
+model Produto {
+  id String @id @default(uuid())
 
-  cardapios Cardapio[]
+  nome String
+
+  categoria String
+
+  unidadeMedida String
+
+  estoqueMinimo Decimal @db.Decimal(10, 3)
+
+  ativo Boolean @default(true)
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  movimentacoes MovimentacaoEstoque[]
+
+  ingredientes Ingrediente[]
 }
 
-// MOVIMENTAÇÕES
+// ============================================================
+// MOVIMENTAÇÕES DE ESTOQUE
+// ============================================================
 
-model MovimentaçãoEstoque {
-id
-produto
-tipo
-quantidadeEntrada
-valorEntrada
-dataEntrada
+enum TipoMovimentacao {
+  ENTRADA
+  SAIDA
+  AJUSTE
+}
 
+model MovimentacaoEstoque {
+  id String @id @default(uuid())
+
+  produtoId String
+
+  tipo TipoMovimentacao
+
+  quantidade Decimal @db.Decimal(10, 3)
+
+  custoUnitario Decimal? @db.Decimal(10, 2)
+
+  observacao String?
+
+  createdAt DateTime @default(now())
+
+  produto Produto @relation(fields: [produtoId], references: [id])
 }
 
 // ============================================================
@@ -43,26 +67,47 @@ dataEntrada
 model Cardapio {
   id String @id @default(uuid())
 
-  nome      String
-  descricao String
+  nome String
+
+  descricao String?
+
   categoria String
 
   precoVenda Decimal @db.Decimal(10, 2)
 
-  quantidadeVenda Int
-
   ativo Boolean @default(true)
 
-  estoqueId String
-  estoque   Estoque @relation(fields: [estoqueId], references: [id])
+  imagem String?
 
-  vendas Venda[]
+  ingredientes Ingrediente[]
 
   itensPedido PedidoItem[]
+
+  vendas Venda[]
 
   previsoes PrevisaoVenda[]
 
   createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+}
+
+// ============================================================
+// FICHA TÉCNICA / INGREDIENTES
+// ============================================================
+
+model Ingrediente {
+  id String @id @default(uuid())
+
+  cardapioId String
+
+  produtoId String
+
+  quantidade Decimal @db.Decimal(10, 3)
+
+  cardapio Cardapio @relation(fields: [cardapioId], references: [id], onDelete: Cascade)
+
+  produto Produto @relation(fields: [produtoId], references: [id])
 }
 
 // ============================================================
@@ -123,10 +168,12 @@ model PedidoItem {
   id String @id @default(uuid())
 
   pedidoId String
-  pedido   Pedido @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+
+  pedido Pedido @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
 
   cardapioId String
-  cardapio   Cardapio @relation(fields: [cardapioId], references: [id])
+
+  cardapio Cardapio @relation(fields: [cardapioId], references: [id])
 
   quantidade Int
 
@@ -145,10 +192,12 @@ model Venda {
   id String @id @default(uuid())
 
   cardapioId String
-  cardapio   Cardapio @relation(fields: [cardapioId], references: [id])
+
+  cardapio Cardapio @relation(fields: [cardapioId], references: [id])
 
   pedidoId String?
-  pedido   Pedido? @relation(fields: [pedidoId], references: [id])
+
+  pedido Pedido? @relation(fields: [pedidoId], references: [id])
 
   quantidade Int
 
@@ -184,24 +233,13 @@ model RelatorioMensal {
 
   referencia String
 
-  totalVendas      Int
+  totalVendas Int
+
   totalFaturamento Decimal @db.Decimal(10, 2)
 
-  itemMaisVendido      String
+  itemMaisVendido String
+
   categoriaMaisVendida String
-
-  createdAt DateTime @default(now())
-}
-
-// ============================================================
-// HISTÓRICO DE ESTOQUE
-// ============================================================
-
-model HistoricoEstoque {
-  id String @id @default(uuid())
-
-  produto         String
-  quantidadeAtual Int
 
   createdAt DateTime @default(now())
 }
@@ -216,7 +254,8 @@ model PrevisaoVenda {
   cardapioId String
 
   previsaoProximaSemana Int
-  previsaoProximoMes    Int
+
+  previsaoProximoMes Int
 
   createdAt DateTime @default(now())
 
@@ -230,7 +269,8 @@ model PrevisaoVenda {
 model Caixa {
   id String @id @default(uuid())
 
-  tipo      String
+  tipo String
+
   descricao String
 
   valor Decimal @db.Decimal(10, 2)
