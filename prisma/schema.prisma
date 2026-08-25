@@ -24,12 +24,30 @@ model Produto {
   ativo Boolean @default(true)
 
   createdAt DateTime @default(now())
-
   updatedAt DateTime @updatedAt
 
-  movimentacoes MovimentacaoEstoque[]
+  estoque Estoque?
 
-  ingredientes Ingrediente[]
+  movimentacoes MovimentacaoEstoque[]
+  ingredientes  Ingrediente[]
+}
+
+// ============================================================
+// ESTOQUE
+// ============================================================
+
+model Estoque {
+  id        String @id @default(uuid())
+  produtoId String @unique
+
+  quantidadeAtual Decimal @db.Decimal(10, 3)
+
+  custoUnitario Decimal @db.Decimal(10, 2)
+
+  createAt DateTime @default(now())
+  UpdateAt DateTime @updatedAt
+
+  produto Produto @relation(fields: [produtoId], references: [id])
 }
 
 // ============================================================

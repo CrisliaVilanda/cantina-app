@@ -1,7 +1,12 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { PedidoStatus, FormaPagamento, Prisma } from "@prisma/client";
+import {
+  FormaPagamento,
+  PedidoStatus,
+  Prisma,
+  TipoMovimentacao,
+} from "@prisma/client";
 
 type ItemPedidoInput = {
   cardapioId: string;
@@ -58,7 +63,7 @@ export async function confirmarPedido({
 
   try {
     const resultado = await prisma.$transaction(async (tx) => {
-      const cardapioIds = itens.map((item) => item.cardapioId);
+      const cardapioIds = [...new Set(itens.map((item) => item.cardapioId))];
 
       const cardapios = await tx.cardapio.findMany({
         where: {
@@ -68,7 +73,15 @@ export async function confirmarPedido({
           ativo: true,
         },
         include: {
-          estoque: true,
+          ingredientes: {
+            include: {
+              produto: {
+                include: {
+                  movimentacoes: true,
+                },
+              },
+            },
+          },
         },
       });
 
@@ -77,34 +90,24 @@ export async function confirmarPedido({
       }
 
       const itensCalculados = itens.map((item) => {
-        const produto = cardapios.find(
-          (cardapio) => cardapio.id === item.cardapioId,
+        const cardapio = cardapios.find(
+          (produto) => produto.id === item.cardapioId,
         );
 
-        if (!produto) {
-          throw new Error("Produto não encontrado.");
+        if (!cardapio) {
+          throw new Error("Produto do cardápio não encontrado.");
         }
 
-        const restante =
-          produto.estoque.quantidadeAdquirida -
-          produto.estoque.quantidadeSaidas;
-
-        if (item.quantidade > restante) {
-          throw new Error(
-            `Estoque insuficiente para ${produto.nome}. Restam ${restante} unidades.`,
-          );
-        }
-
-        const precoUnitario = new Prisma.Decimal(produto.precoVenda);
+        const precoUnitario = new Prisma.Decimal(cardapio.precoVenda);
 
         const subtotal = precoUnitario.mul(item.quantidade);
 
         return {
-          cardapioId: produto.id,
+          cardapioId: cardapio.id,
           quantidade: item.quantidade,
           precoUnitario,
           subtotal,
-          estoqueId: produto.estoqueId,
+          ingredientes: cardapio.ingredientes,
         };
       });
 
@@ -112,6 +115,72 @@ export async function confirmarPedido({
         (acc, item) => acc.plus(item.subtotal),
         new Prisma.Decimal(0),
       );
+
+      // Verifica e prepara as baixas de estoque
+      const baixasEstoque = new Map<
+        string,
+        {
+          produtoId: string;
+          quantidade: Prisma.Decimal;
+          custoUnitario: Prisma.Decimal;
+          produtoNome: string;
+        }
+      >();
+
+      for (const item of itensCalculados) {
+        for (const ingrediente of item.ingredientes) {
+          const quantidadeNecessaria = new Prisma.Decimal(
+            ingrediente.quantidade,
+          ).mul(item.quantidade);
+
+          const existente = baixasEstoque.get(ingrediente.produtoId);
+
+          if (existente) {
+            existente.quantidade =
+              existente.quantidade.plus(quantidadeNecessaria);
+          } else {
+            const estoque = await tx.estoque.findFirst({
+              where: {
+                produto: ingrediente.produto.nome,
+              },
+            });
+
+            if (!estoque) {
+              throw new Error(
+                `Estoque não encontrado para ${ingrediente.produto.nome}.`,
+              );
+            }
+
+            baixasEstoque.set(ingrediente.produtoId, {
+              produtoId: ingrediente.produtoId,
+              quantidade: quantidadeNecessaria,
+              custoUnitario: new Prisma.Decimal(estoque.custoUnitario),
+              produtoNome: ingrediente.produto.nome,
+            });
+          }
+        }
+      }
+
+      // Verifica se existe estoque suficiente
+      for (const baixa of baixasEstoque.values()) {
+        const estoque = await tx.estoque.findFirst({
+          where: {
+            produto: baixa.produtoNome,
+          },
+        });
+
+        if (!estoque) {
+          throw new Error(`Estoque não encontrado para ${baixa.produtoNome}.`);
+        }
+
+        const quantidadeAtual = new Prisma.Decimal(estoque.quantidadeAtual);
+
+        if (baixa.quantidade.gt(quantidadeAtual)) {
+          throw new Error(
+            `Estoque insuficiente para ${baixa.produtoNome}. Disponível: ${quantidadeAtual.toString()}. Necessário: ${baixa.quantidade.toString()}.`,
+          );
+        }
+      }
 
       // Cria o pedido
       const pedido = await tx.pedido.create({
@@ -134,7 +203,7 @@ export async function confirmarPedido({
         })),
       });
 
-      // Registra as vendas e baixa o estoque
+      // Registra as vendas
       for (const item of itensCalculados) {
         await tx.venda.create({
           data: {
@@ -144,32 +213,44 @@ export async function confirmarPedido({
             total: item.subtotal,
           },
         });
+      }
 
-        const estoqueAtual = await tx.estoque.findUnique({
+      // Baixa o estoque e registra movimentação
+      for (const baixa of baixasEstoque.values()) {
+        const estoque = await tx.estoque.findFirst({
           where: {
-            id: item.estoqueId,
+            produto: baixa.produtoNome,
           },
         });
 
-        if (!estoqueAtual) {
-          throw new Error("Estoque do produto não encontrado.");
+        if (!estoque) {
+          throw new Error(`Estoque não encontrado para ${baixa.produtoNome}.`);
         }
 
-        const restante =
-          estoqueAtual.quantidadeAdquirida - estoqueAtual.quantidadeSaidas;
+        const novaQuantidade = new Prisma.Decimal(
+          estoque.quantidadeAtual,
+        ).minus(baixa.quantidade);
 
-        if (item.quantidade > restante) {
-          throw new Error("Estoque insuficiente para finalizar o pedido.");
+        if (novaQuantidade.lt(0)) {
+          throw new Error(`Estoque insuficiente para ${baixa.produtoNome}.`);
         }
 
         await tx.estoque.update({
           where: {
-            id: item.estoqueId,
+            id: estoque.id,
           },
           data: {
-            quantidadeSaidas: {
-              increment: item.quantidade,
-            },
+            quantidadeAtual: novaQuantidade.toNumber(),
+          },
+        });
+
+        await tx.movimentacaoEstoque.create({
+          data: {
+            produtoId: baixa.produtoId,
+            tipo: TipoMovimentacao.SAIDA,
+            quantidade: baixa.quantidade,
+            custoUnitario: baixa.custoUnitario,
+            observacao: `Saída referente ao pedido ${pedido.numero}`,
           },
         });
       }
@@ -184,7 +265,7 @@ export async function confirmarPedido({
       );
 
       const quantidadeVendida = itensCalculados.reduce(
-        (total, item) => total + item.quantidade,
+        (totalQuantidade, item) => totalQuantidade + item.quantidade,
         0,
       );
 
@@ -192,17 +273,14 @@ export async function confirmarPedido({
         where: {
           data: inicioDia,
         },
-
         update: {
           totalVendas: {
             increment: quantidadeVendida,
           },
-
           totalArrecadado: {
             increment: total,
           },
         },
-
         create: {
           data: inicioDia,
           totalVendas: quantidadeVendida,
@@ -216,6 +294,7 @@ export async function confirmarPedido({
     return {
       success: true,
       pedidoId: resultado.id,
+      numeroPedido: resultado.numero,
     };
   } catch (error) {
     console.error("Erro ao confirmar pedido:", error);

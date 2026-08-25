@@ -50,6 +50,11 @@ export const adminMenu: MenuItem[] = [
         icon: Package,
       },
       {
+        title: "Produtos",
+        href: "/admin/estoque/produtos",
+        icon: Package,
+      },
+      {
         title: "Entradas",
         href: "/admin/estoque/entradas",
         icon: ArrowDownToLine,
