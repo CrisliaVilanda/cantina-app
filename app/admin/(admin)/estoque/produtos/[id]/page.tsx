@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 
 import { prisma } from "@/lib/prisma";
-import { atualizarProduto } from "@/app/actions/produto.actions";
+import { atualizarProduto } from "@/app/actions/produtos.actions";
 
 type ProdutoEditPageProps = {
   params: Promise<{

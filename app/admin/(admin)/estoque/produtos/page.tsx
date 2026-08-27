@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { alternarProdutoAtivo } from "@/app/actions/estoque/produtos.actions";
+import ProdutoStatusButton from "./ProdutoStatusButton";
 
 export default async function ProdutosPage() {
   const produtos = await prisma.produto.findMany({
@@ -155,20 +155,10 @@ export default async function ProdutosPage() {
                             Editar
                           </Link>
 
-                          <form
-                            action={async () => {
-                              await alternarProdutoAtivo(produto.id);
-                            }}
-                          >
-                            <button
-                              type="submit"
-                              className="rounded-md border px-3 py-2 text-xs font-medium hover:bg-muted"
-                            >
-                              {produto.ativo
-                                ? "Desativar"
-                                : "Ativar"}
-                            </button>
-                          </form>
+                          <ProdutoStatusButton
+                            id={produto.id}
+                            ativo={produto.ativo}
+                          />
                         </div>
                       </td>
                     </tr>

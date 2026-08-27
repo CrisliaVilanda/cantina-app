@@ -47,7 +47,7 @@ model Estoque {
   createAt DateTime @default(now())
   UpdateAt DateTime @updatedAt
 
-  produto Produto @relation(fields: [produtoId], references: [id])
+  produto Produto @relation(fields: [produtoId], references: [id],  onDelete: Cascade)
 }
 
 // ============================================================
