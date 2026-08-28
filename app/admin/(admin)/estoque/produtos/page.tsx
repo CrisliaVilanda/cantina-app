@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import ProdutoStatusButton from "./ProdutoStatusButton";
+import ProdutoStatusButton from "../../../../components/admin/ProdutoStatusButton";
 
 export default async function ProdutosPage() {
   const produtos = await prisma.produto.findMany({
