@@ -1,25 +1,44 @@
+import Link from "next/link";
+
 import { prisma } from "@/lib/prisma";
-import EntradaEstoqueForm from "../../../../components/admin/EntradaEstoqueForm";
+import EntradaForm from "../../../../components/admin/EntradaEstoqueForm";
+
 
 export default async function EntradaEstoquePage() {
-  const produtosDb = await prisma.produto.findMany({
+  const produtos = await prisma.produto.findMany({
     where: {
       ativo: true,
+    },
+    select: {
+      id: true,
+      nome: true,
+      unidadeMedida: true,
     },
     orderBy: {
       nome: "asc",
     },
   });
 
-  const produtos = produtosDb.map((produto) => ({
-    id: produto.id,
-    nome: produto.nome,
-    categoria: produto.categoria,
-    unidadeMedida: produto.unidadeMedida,
-    estoqueMinimo: Number(produto.estoqueMinimo),
-  }));
-
   return (
-    <EntradaEstoqueForm produtos={produtos} />
+    <div className="mx-auto max-w-2xl space-y-6">
+      <div>
+        <Link
+          href="/admin/estoque/movimentacoes"
+          className="text-sm text-muted-foreground hover:text-foreground"
+        >
+          ← Voltar para movimentações
+        </Link>
+
+        <h1 className="mt-4 text-3xl font-bold">
+          Entrada de estoque
+        </h1>
+
+        <p className="mt-1 text-muted-foreground">
+          Registre a entrada de produtos na cantina.
+        </p>
+      </div>
+
+      <EntradaForm produtos={produtos} />
+    </div>
   );
 }

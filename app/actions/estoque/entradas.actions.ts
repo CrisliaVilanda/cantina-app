@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { TipoMovimentacao, Prisma } from "@prisma/client";
+import { Prisma, TipoMovimentacao } from "@prisma/client";
 
 type CriarEntradaInput = {
   produtoId: string;
@@ -16,7 +16,10 @@ export async function criarEntradaEstoque({
   custoUnitario,
   observacao,
 }: CriarEntradaInput) {
-  if (!produtoId) {
+  const produtoIdLimpo = produtoId.trim();
+  const observacaoLimpa = observacao?.trim() || null;
+
+  if (!produtoIdLimpo) {
     return {
       success: false,
       error: "Selecione um produto.",
@@ -38,13 +41,22 @@ export async function criarEntradaEstoque({
   }
 
   try {
+    const quantidadeDecimal = new Prisma.Decimal(quantidade);
+    const custoDecimal = new Prisma.Decimal(custoUnitario);
+
     const resultado = await prisma.$transaction(async (tx) => {
       const produto = await tx.produto.findUnique({
         where: {
-          id: produtoId,
+          id: produtoIdLimpo,
         },
-        include: {
-          estoque: true,
+        select: {
+          id: true,
+          ativo: true,
+          estoque: {
+            select: {
+              id: true,
+            },
+          },
         },
       });
 
@@ -56,13 +68,10 @@ export async function criarEntradaEstoque({
         throw new Error("Não é possível movimentar um produto inativo.");
       }
 
-      const quantidadeDecimal = new Prisma.Decimal(quantidade);
-      const custoDecimal = new Prisma.Decimal(custoUnitario);
-
-      let estoque;
+      let estoqueId: string;
 
       if (produto.estoque) {
-        estoque = await tx.estoque.update({
+        await tx.estoque.update({
           where: {
             id: produto.estoque.id,
           },
@@ -73,14 +82,21 @@ export async function criarEntradaEstoque({
             custoUnitario: custoDecimal,
           },
         });
+
+        estoqueId = produto.estoque.id;
       } else {
-        estoque = await tx.estoque.create({
+        const estoque = await tx.estoque.create({
           data: {
             produtoId: produto.id,
             quantidadeAtual: quantidadeDecimal,
             custoUnitario: custoDecimal,
           },
+          select: {
+            id: true,
+          },
         });
+
+        estoqueId = estoque.id;
       }
 
       const movimentacao = await tx.movimentacaoEstoque.create({
@@ -89,20 +105,22 @@ export async function criarEntradaEstoque({
           tipo: TipoMovimentacao.ENTRADA,
           quantidade: quantidadeDecimal,
           custoUnitario: custoDecimal,
-          observacao: observacao?.trim() || null,
+          observacao: observacaoLimpa,
+        },
+        select: {
+          id: true,
         },
       });
 
       return {
-        estoque,
-        movimentacao,
+        estoqueId,
+        movimentacaoId: movimentacao.id,
       };
     });
 
     return {
       success: true,
-      estoqueId: resultado.estoque.id,
-      movimentacaoId: resultado.movimentacao.id,
+      ...resultado,
     };
   } catch (error) {
     console.error("Erro ao registrar entrada de estoque:", error);
