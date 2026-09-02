@@ -63,6 +63,10 @@ export const adminMenu: MenuItem[] = [
         title: "Movimentações",
         href: "/admin/estoque/movimentacoes",
         icon: ArrowUpFromLine,
+      }, {
+        title: "Saídas",
+        href: "/admin/estoque/saidas",
+        icon: ArrowUpFromLine,
       },
       {
         title: "Estoque baixo",
